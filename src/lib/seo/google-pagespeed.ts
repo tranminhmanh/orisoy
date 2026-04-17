@@ -1,3 +1,12 @@
+interface LighthouseAudit {
+  id?: string;
+  title?: string;
+  description?: string;
+  displayValue?: string;
+  numericValue?: number;
+  details?: { type?: string; overallSavingsMs?: number };
+}
+
 export interface PageSpeedResult {
   url: string;
   strategy: "mobile" | "desktop";
@@ -78,25 +87,25 @@ export async function getPageSpeedData(
 
     // Extract opportunities
     const opportunities = Object.values(audits)
-      .filter((audit: any) => audit.details?.type === "opportunity" && audit.details?.overallSavingsMs > 0)
-      .map((audit: any) => ({
+      .filter((a) => { const audit = a as LighthouseAudit; return audit.details?.type === "opportunity" && (audit.details?.overallSavingsMs ?? 0) > 0; })
+      .map((a) => { const audit = a as LighthouseAudit; return {
         id: audit.id ?? "",
         title: audit.title ?? "",
         description: audit.description ?? "",
         savings: audit.details?.overallSavingsMs ?? 0,
         savingsUnit: "ms",
-      }));
+      }; });
 
     // Extract diagnostics
     const diagnostics = Object.values(audits)
-      .filter((audit: any) => audit.details?.type === "table" || audit.details?.type === "list")
+      .filter((a) => { const audit = a as LighthouseAudit; return audit.details?.type === "table" || audit.details?.type === "list"; })
       .slice(0, 10)
-      .map((audit: any) => ({
+      .map((a) => { const audit = a as LighthouseAudit; return {
         id: audit.id ?? "",
         title: audit.title ?? "",
         description: audit.description ?? "",
         displayValue: audit.displayValue ?? "",
-      }));
+      }; });
 
     return {
       url,

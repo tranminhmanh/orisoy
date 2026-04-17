@@ -155,7 +155,7 @@ export class WordPressClient {
           "Content-Disposition": `attachment; filename="${params.filename}"`,
           "Content-Type": params.mimeType,
         },
-        body: params.file,
+        body: new Uint8Array(params.file),
       });
 
       if (!response.ok) {

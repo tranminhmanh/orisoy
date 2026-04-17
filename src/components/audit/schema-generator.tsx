@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Copy, Check, Code } from "lucide-react";
 
 interface SchemaGeneratorProps {
-  onGenerate: (type: string, data: any) => void;
+  onGenerate: (type: string, data: Record<string, string>) => void;
 }
 
 const schemaTypes = [
@@ -110,7 +110,7 @@ const fieldsByType: Record<SchemaType, { key: string; label: string; type?: stri
 };
 
 function buildJsonLd(type: SchemaType, data: Record<string, string>): object {
-  const base: Record<string, any> = {
+  const base: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": type,
     name: data.name || "",

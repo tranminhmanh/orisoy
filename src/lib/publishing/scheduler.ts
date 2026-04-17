@@ -20,7 +20,7 @@ export interface QueueStatus {
 
 export async function schedulePublishJob(params: {
   articleId: string;
-  platform: string;
+  platform: "wordpress" | "facebook" | "instagram" | "twitter";
   scheduledAt: Date;
   projectId: string;
 }): Promise<string> {
@@ -51,7 +51,7 @@ export async function getQueueStatus(): Promise<QueueStatus> {
     const [pending, processing, completed, failed] = await Promise.all([
       prisma.publishJob.count({ where: { status: "pending" } }),
       prisma.publishJob.count({ where: { status: "processing" } }),
-      prisma.publishJob.count({ where: { status: "completed" } }),
+      prisma.publishJob.count({ where: { status: "published" } }),
       prisma.publishJob.count({ where: { status: "failed" } }),
     ]);
 
@@ -110,11 +110,6 @@ export async function processNextJob(): Promise<void> {
           // TODO: Publish to Twitter
           break;
         }
-        case "telegram": {
-          // const { sendTelegramMessage } = await import("./telegram");
-          // TODO: Send via Telegram
-          break;
-        }
         default:
           throw new Error(`Unsupported platform: ${job.platform}`);
       }
@@ -123,8 +118,8 @@ export async function processNextJob(): Promise<void> {
       await prisma.publishJob.update({
         where: { id: job.id },
         data: {
-          status: "completed",
-          completedAt: new Date(),
+          status: "published",
+          publishedAt: new Date(),
         },
       });
     } catch (publishError) {

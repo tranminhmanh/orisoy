@@ -20,7 +20,7 @@ export type {
   SeoReport,
   Project,
   User,
-} from "@/generated/prisma";
+} from "@/generated/prisma/client";
 
 export type {
   SearchIntent,
@@ -39,4 +39,4 @@ export type {
   SearchEngine,
   Device,
   ReportType,
-} from "@/generated/prisma";
+} from "@/generated/prisma/client";

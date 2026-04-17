@@ -75,13 +75,14 @@ export async function generateArticle(
   try {
     const brief = await prisma.contentBrief.findUnique({
       where: { id: briefId },
+      include: { article: true },
     });
 
     if (!brief) {
       throw new Error(`Content brief not found: ${briefId}`);
     }
 
-    const prompt = `Write a ${options.wordCount}-word article with a ${options.tone} tone based on this brief:\nTitle: ${brief.title}\nKeyword: ${brief.targetKeyword}\nOutline: ${JSON.stringify(brief.outline)}`;
+    const prompt = `Write a ${options.wordCount}-word article with a ${options.tone} tone based on this brief:\nTitle: ${brief.article.title}\nOutline: ${JSON.stringify(brief.outline)}`;
 
     const article = await generateText(prompt, {
       maxTokens: options.wordCount * 2,
@@ -104,7 +105,7 @@ export async function refreshArticle(
   try {
     const article = await prisma.article.findUnique({
       where: { id: articleId },
-      include: { contentBrief: true },
+      include: { brief: true },
     });
 
     if (!article) {

@@ -120,13 +120,13 @@ async function fetchCompetitor(seed: string, projectId: string): Promise<Discove
   try {
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      include: { competitors: true },
+      include: { competitorDomains: true },
     });
 
-    if (!project?.competitors?.length) return [];
+    if (!project?.competitorDomains?.length) return [];
 
     const allKeywords: DiscoveredKeyword[] = [];
-    for (const competitor of project.competitors.slice(0, 3)) {
+    for (const competitor of project.competitorDomains.slice(0, 3)) {
       try {
         const result = await dataForSeoClient.getRankedKeywords(competitor.domain);
         const keywords = (result.keywords ?? [])

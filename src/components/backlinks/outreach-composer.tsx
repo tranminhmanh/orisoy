@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 import { Mail, Send, Sparkles, Loader2 } from "lucide-react";
 
 interface OutreachComposerProps {
-  onGenerate: (params: any) => void;
-  onSend: (email: any) => void;
+  onGenerate: (params: Record<string, string>) => void;
+  onSend: (email: { to: string; subject: string; body: string; campaignType: string; prospectDomain: string }) => void;
   email?: { subject: string; body: string };
   isLoading?: boolean;
 }

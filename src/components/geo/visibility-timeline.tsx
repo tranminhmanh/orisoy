@@ -58,7 +58,7 @@ export function VisibilityTimeline({ data }: VisibilityTimelineProps) {
               borderRadius: 8,
               border: "1px solid #e4e4e7",
             }}
-            formatter={(value: number) => [`${value}%`]}
+            formatter={(value) => [`${value}%`]}
           />
           <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
           <Line

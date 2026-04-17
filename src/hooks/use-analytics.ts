@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 
 export function useAnalytics(projectId?: string) {
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<Record<string, unknown> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchDashboard = useCallback(async () => {

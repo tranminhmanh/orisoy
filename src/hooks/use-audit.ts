@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 
 export function useAudit(projectId?: string) {
-  const [audit, setAudit] = useState<any>(null);
+  const [audit, setAudit] = useState<Record<string, unknown> | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const runCrawl = useCallback(
@@ -30,7 +30,7 @@ export function useAudit(projectId?: string) {
     return await res.json();
   }, []);
 
-  const generateSchema = useCallback(async (url: string, type: string, data: any) => {
+  const generateSchema = useCallback(async (url: string, type: string, data: Record<string, string>) => {
     const res = await fetch("/api/audit/schema", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

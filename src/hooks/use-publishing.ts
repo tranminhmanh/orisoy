@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 
 export function usePublishing(projectId?: string) {
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Record<string, unknown>[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchJobs = useCallback(async () => {

@@ -26,7 +26,7 @@ export async function generateImage(
       quality: (options?.quality as "standard" | "hd") ?? "standard",
     });
 
-    const url = response.data[0]?.url;
+    const url = response.data?.[0]?.url;
     if (!url) {
       throw new Error("No image URL returned from OpenAI");
     }

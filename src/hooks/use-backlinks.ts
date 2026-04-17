@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 
 export function useBacklinks(projectId?: string) {
-  const [backlinks, setBacklinks] = useState<any[]>([]);
+  const [backlinks, setBacklinks] = useState<Record<string, unknown>[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchBacklinks = useCallback(async () => {
@@ -34,7 +34,7 @@ export function useBacklinks(projectId?: string) {
     [projectId]
   );
 
-  const generateOutreach = useCallback(async (params: any) => {
+  const generateOutreach = useCallback(async (params: Record<string, unknown>) => {
     const res = await fetch("/api/backlinks/outreach", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
