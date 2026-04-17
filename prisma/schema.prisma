@@ -1,0 +1,488 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SearchIntent {
+  informational
+  navigational
+  commercial
+  transactional
+  local
+  generative
+}
+
+enum ArticleStatus {
+  idea
+  briefed
+  writing
+  review
+  published
+  tracking
+}
+
+enum ImageSource {
+  ai
+  unsplash
+  pexels
+  upload
+}
+
+enum PublishPlatform {
+  wordpress
+  facebook
+  instagram
+  twitter
+}
+
+enum PublishStatus {
+  pending
+  processing
+  published
+  failed
+}
+
+enum LinkType {
+  dofollow
+  nofollow
+  sponsored
+  ugc
+}
+
+enum BacklinkStatus {
+  live
+  lost
+  broken
+}
+
+enum AuditSeverity {
+  critical
+  warning
+  info
+}
+
+enum AuditCategory {
+  crawlability
+  titles_meta
+  headings
+  content
+  images
+  internal_links
+  core_web_vitals
+  mobile
+  schema
+}
+
+enum OutreachStatus {
+  draft
+  sent
+  opened
+  replied
+  acquired
+}
+
+enum IndexMethod {
+  indexing_api
+  search_console
+  indexnow
+}
+
+enum IndexStatus {
+  pending
+  submitted
+  crawled
+  indexed
+  error
+}
+
+enum AiPlatform {
+  chatgpt
+  perplexity
+  gemini
+  google_aio
+}
+
+enum SearchEngine {
+  google
+  coccoc
+}
+
+enum Device {
+  desktop
+  mobile
+}
+
+enum ReportType {
+  weekly
+  monthly
+  quarterly
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  name                String?
+  hashedPassword      String?
+  image               String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  projects            Project[]
+  platformConnections PlatformConnection[]
+}
+
+model Project {
+  id                String              @id @default(cuid())
+  name              String
+  domain            String
+  settings          Json                @default("{}")
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  userId            String
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keywords          Keyword[]
+  clusters          KeywordCluster[]
+  articles          Article[]
+  competitorDomains CompetitorDomain[]
+  siteAudits        SiteAudit[]
+  schemaMarkups     SchemaMarkup[]
+  backlinks         Backlink[]
+  outreachCampaigns OutreachCampaign[]
+  brandMentions     BrandMention[]
+  geoReports        GeoReport[]
+  aiVisibilities    AiVisibility[]
+  publishJobs       PublishJob[]
+  platformConnections PlatformConnection[]
+  indexRequests     IndexRequest[]
+  rankSnapshots     RankSnapshot[]
+  seoReports        SeoReport[]
+  images            Image[]
+
+  @@index([userId])
+}
+
+// M1: Keyword Research
+model Keyword {
+  id             String         @id @default(cuid())
+  term           String
+  searchVolume   Int            @default(0)
+  difficulty     Int            @default(0)
+  cpc            Float          @default(0)
+  intent         SearchIntent   @default(informational)
+  trend          Json           @default("[]")
+  source         String         @default("manual")
+  serpFeatures   Json           @default("[]")
+  hasAiOverview  Boolean        @default(false)
+  geoOpportunity String         @default("low")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  projectId      String
+  project        Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clusterId      String?
+  cluster        KeywordCluster? @relation(fields: [clusterId], references: [id])
+  rankSnapshots  RankSnapshot[]
+  articles       Article[]      @relation("ArticleTargetKeywords")
+
+  @@index([projectId])
+  @@index([clusterId])
+}
+
+model KeywordCluster {
+  id              String    @id @default(cuid())
+  name            String
+  contentType     String    @default("blog")
+  totalVolume     Int       @default(0)
+  priorityScore   Int       @default(0)
+  createdAt       DateTime  @default(now())
+  projectId       String
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  keywords        Keyword[]
+  article         Article?  @relation("ClusterArticle")
+
+  @@index([projectId])
+}
+
+model CompetitorDomain {
+  id           String   @id @default(cuid())
+  domain       String
+  domainRating Int      @default(0)
+  trafficEst   Int      @default(0)
+  keywordCount Int      @default(0)
+  data         Json     @default("{}")
+  createdAt    DateTime @default(now())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// M2: Content Studio
+model Article {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String
+  content         String        @default("")
+  excerpt         String        @default("")
+  metaTitle       String        @default("")
+  metaDescription String        @default("")
+  status          ArticleStatus @default(idea)
+  seoScore        Int           @default(0)
+  geoScore        Int           @default(0)
+  tone            String        @default("professional")
+  wordCount       Int           @default(0)
+  nlpEntities     Json          @default("[]")
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  scheduledAt     DateTime?
+  publishedAt     DateTime?
+  projectId       String
+  project         Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clusterId       String?       @unique
+  cluster         KeywordCluster? @relation("ClusterArticle", fields: [clusterId], references: [id])
+  targetKeywords  Keyword[]     @relation("ArticleTargetKeywords")
+  brief           ContentBrief?
+  images          Image[]
+  publishJobs     PublishJob[]
+  geoReports      GeoReport[]
+
+  @@index([projectId])
+  @@index([status])
+}
+
+model ContentBrief {
+  id                String   @id @default(cuid())
+  outline           Json     @default("[]")
+  nlpRequired       Json     @default("[]")
+  geoRequirements   Json     @default("{}")
+  competitorInsights Json    @default("[]")
+  targetWordCount   Int      @default(1500)
+  createdAt         DateTime @default(now())
+  articleId         String   @unique
+  article           Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model Image {
+  id        String      @id @default(cuid())
+  url       String
+  altText   String      @default("")
+  source    ImageSource @default(upload)
+  prompt    String?
+  width     Int?
+  height    Int?
+  sizeKb    Int?
+  createdAt DateTime    @default(now())
+  articleId String?
+  article   Article?    @relation(fields: [articleId], references: [id])
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([articleId])
+}
+
+// M3: Technical SEO Audit
+model SiteAudit {
+  id           String       @id @default(cuid())
+  healthScore  Int          @default(0)
+  crawledPages Int          @default(0)
+  summary      Json         @default("{}")
+  createdAt    DateTime     @default(now())
+  projectId    String
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  issues       AuditIssue[]
+
+  @@index([projectId])
+}
+
+model AuditIssue {
+  id           String        @id @default(cuid())
+  severity     AuditSeverity
+  category     AuditCategory
+  title        String
+  description  String
+  affectedUrls Json          @default("[]")
+  fix          String        @default("")
+  isResolved   Boolean       @default(false)
+  auditId      String
+  audit        SiteAudit     @relation(fields: [auditId], references: [id], onDelete: Cascade)
+
+  @@index([auditId])
+}
+
+model SchemaMarkup {
+  id        String   @id @default(cuid())
+  url       String
+  type      String
+  jsonLd    Json
+  isValid   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// M4: Off-Page SEO
+model Backlink {
+  id           String         @id @default(cuid())
+  sourceUrl    String
+  sourceDr     Int            @default(0)
+  targetUrl    String
+  anchorText   String         @default("")
+  linkType     LinkType       @default(dofollow)
+  toxicScore   Int            @default(0)
+  status       BacklinkStatus @default(live)
+  discoveredAt DateTime       @default(now())
+  projectId    String
+  project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model OutreachCampaign {
+  id             String         @id @default(cuid())
+  prospectEmail  String
+  prospectDomain String
+  emailSubject   String
+  emailBody      String
+  campaignType   String         @default("guest_post")
+  status         OutreachStatus @default(draft)
+  sentAt         DateTime?
+  repliedAt      DateTime?
+  createdAt      DateTime       @default(now())
+  projectId      String
+  project        Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model BrandMention {
+  id           String   @id @default(cuid())
+  sourceUrl    String
+  platform     String
+  snippet      String   @default("")
+  hasLink      Boolean  @default(false)
+  sentiment    String   @default("neutral")
+  discoveredAt DateTime @default(now())
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// M5: GEO & AI Search
+model GeoReport {
+  id                String   @id @default(cuid())
+  query             String
+  citabilityScore   Int      @default(0)
+  dimensions        Json     @default("{}")
+  simulationResults Json     @default("{}")
+  createdAt         DateTime @default(now())
+  projectId         String
+  project           Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  articleId         String?
+  article           Article? @relation(fields: [articleId], references: [id])
+
+  @@index([projectId])
+}
+
+model AiVisibility {
+  id           String     @id @default(cuid())
+  platform     AiPlatform
+  query        String
+  isCited      Boolean    @default(false)
+  citationType String     @default("none")
+  response     String     @default("")
+  createdAt    DateTime   @default(now())
+  projectId    String
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// M6: Publishing
+model PublishJob {
+  id             String          @id @default(cuid())
+  platform       PublishPlatform
+  status         PublishStatus   @default(pending)
+  platformPostId String?
+  scheduledAt    DateTime
+  publishedAt    DateTime?
+  error          String?
+  createdAt      DateTime        @default(now())
+  articleId      String
+  article        Article         @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([articleId])
+  @@index([status])
+}
+
+model PlatformConnection {
+  id           String   @id @default(cuid())
+  platform     String
+  accessToken  String
+  refreshToken String?
+  metadata     Json     @default("{}")
+  expiresAt    DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([projectId])
+}
+
+model IndexRequest {
+  id          String      @id @default(cuid())
+  url         String
+  method      IndexMethod @default(indexing_api)
+  status      IndexStatus @default(pending)
+  submittedAt DateTime    @default(now())
+  crawledAt   DateTime?
+  indexedAt    DateTime?
+  error       String?
+  projectId   String
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// M7: Analytics
+model RankSnapshot {
+  id          String       @id @default(cuid())
+  position    Int
+  device      Device       @default(desktop)
+  engine      SearchEngine @default(google)
+  location    String       @default("Vietnam")
+  serpFeature String?
+  createdAt   DateTime     @default(now())
+  keywordId   String
+  keyword     Keyword      @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+  projectId   String
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([keywordId])
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+model SeoReport {
+  id        String     @id @default(cuid())
+  type      ReportType
+  data      Json       @default("{}")
+  createdAt DateTime   @default(now())
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
