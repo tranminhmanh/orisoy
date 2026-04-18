@@ -1,3 +1,6 @@
+## BẮT BUỘC ĐỌC TRƯỚC KHI CODE
+Trước khi làm bất kỳ task nào chạm route/schema/form/sidebar, đọc `./INTEGRITY.md` và tuân thủ checklist. KHÔNG báo "done" nếu chưa chạy mục 9.
+
 @AGENTS.md
 
 # Orisoy SEO Suite - Project Knowledge Base
