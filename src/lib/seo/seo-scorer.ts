@@ -133,7 +133,7 @@ export function scoreSeoContent(params: ScorerParams): SeoScoreBreakdown {
 
   const h1Match = content.match(/<h1[^>]*>(.*?)<\/h1>/gi) || content.match(/^# .+$/gm);
   const h2Match = content.match(/<h2[^>]*>(.*?)<\/h2>/gi) || content.match(/^## .+$/gm);
-  const h3Match = content.match(/<h3[^>]*>(.*?)<\/h3>/gi) || content.match(/^### .+$/gm);
+  const _h3Match = content.match(/<h3[^>]*>(.*?)<\/h3>/gi) || content.match(/^### .+$/gm);
 
   checks.push({
     id: "h1_present",

@@ -105,7 +105,7 @@ Score these dimensions:
 
 Return JSON with scores.`;
 
-    const response = await generateText(prompt, { maxTokens: 1024 });
+    const _response = await generateText(prompt, { maxTokens: 1024 });
 
     // TODO: Parse AI response for actual scores
     // Placeholder scoring

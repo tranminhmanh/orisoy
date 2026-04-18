@@ -1,4 +1,4 @@
-type SchemaType =
+type _SchemaType =
   | "Article"
   | "BlogPosting"
   | "FAQPage"

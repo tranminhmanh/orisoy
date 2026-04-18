@@ -100,7 +100,7 @@ async function simulatePlatform(
       snippetUsed: null,
       simulatedAt: new Date(),
     };
-  } catch (error) {
+  } catch (_error) {
     return {
       platform,
       query,

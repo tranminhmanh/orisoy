@@ -44,7 +44,7 @@ const DIACRITICS_MAP_UPPER: Record<string, string> = {
 const FULL_MAP = { ...DIACRITICS_MAP, ...DIACRITICS_MAP_UPPER };
 
 // Tone mark variants for each base vowel (for generating diacritic variants)
-const TONE_VARIANTS: Record<string, string[]> = {
+const _TONE_VARIANTS: Record<string, string[]> = {
   "a": ["a", "à", "á", "ả", "ã", "ạ"],
   "ă": ["ă", "ằ", "ắ", "ẳ", "ẵ", "ặ"],
   "â": ["â", "ầ", "ấ", "ẩ", "ẫ", "ậ"],

@@ -14,9 +14,9 @@ export async function publishToTwitter(
   try {
     const bearerToken = process.env.TWITTER_BEARER_TOKEN;
     const accessToken = process.env.TWITTER_ACCESS_TOKEN;
-    const accessSecret = process.env.TWITTER_ACCESS_SECRET;
-    const apiKey = process.env.TWITTER_API_KEY;
-    const apiSecret = process.env.TWITTER_API_SECRET;
+    const _accessSecret = process.env.TWITTER_ACCESS_SECRET;
+    const _apiKey = process.env.TWITTER_API_KEY;
+    const _apiSecret = process.env.TWITTER_API_SECRET;
 
     if (!accessToken) {
       throw new Error("Twitter access token not configured");

@@ -15,7 +15,7 @@ export interface ContentBriefData {
 
 export async function generateContentBrief(
   clusterId: string,
-  projectId: string
+  _projectId: string
 ): Promise<ContentBriefData> {
   // TODO: Fetch cluster data from DB and generate brief via AI
   try {

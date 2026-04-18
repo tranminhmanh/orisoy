@@ -66,7 +66,7 @@ export function RecentActivity({ activities }: RecentActivityProps) {
           {activities.map((activity, idx) => {
             const config = typeConfig[activity.type] ?? defaultConfig;
             const ActivityIcon = config.icon;
-            const isLast = idx === activities.length - 1;
+            const _isLast = idx === activities.length - 1;
 
             return (
               <div key={activity.id} className="relative flex gap-3">

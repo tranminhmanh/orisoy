@@ -1,5 +1,3 @@
-import { generateText } from "@/lib/ai/claude";
-
 export interface CitabilityScore {
   total: number;
   factDensity: number;

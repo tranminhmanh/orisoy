@@ -1,4 +1,3 @@
-import { prisma } from "@/lib/prisma";
 import { dataForSeoClient } from "./dataforseo";
 
 export interface CompetitorAnalysis {
@@ -52,7 +51,7 @@ export interface OverlapResult {
 
 export async function analyzeCompetitor(
   domain: string,
-  projectId: string
+  _projectId: string
 ): Promise<CompetitorAnalysis> {
   // TODO: Implement real competitor analysis using DataForSEO
   try {

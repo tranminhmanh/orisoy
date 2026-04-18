@@ -1,4 +1,4 @@
-interface SitemapUrl {
+interface _SitemapUrl {
   loc: string;
   lastmod?: string;
   priority?: number;
