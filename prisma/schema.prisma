@@ -122,6 +122,20 @@ enum ReportType {
   quarterly
 }
 
+// BYOK integrations — api keys/credentials per user, encrypted at rest
+enum IntegrationProvider {
+  llm           // Claude / OpenAI / Ollama / custom OpenAI-compat
+  image         // DALL-E / Stability / ...
+  dataforseo
+  pagespeed     // optional key, falls back to anonymous
+}
+
+enum IntegrationStatus {
+  untested
+  ok
+  failed
+}
+
 model User {
   id                  String               @id @default(cuid())
   email               String               @unique
@@ -132,6 +146,7 @@ model User {
   updatedAt           DateTime             @updatedAt
   projects            Project[]
   platformConnections PlatformConnection[]
+  integrations        Integration[]
 }
 
 model Project {
@@ -484,4 +499,22 @@ model SeoReport {
   project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
+}
+
+// Integration — BYOK credentials per user. `config` is AES-256-GCM encrypted JSON.
+// Shape of decrypted JSON varies by provider, see src/lib/integrations/types.ts.
+model Integration {
+  id           String              @id @default(cuid())
+  provider     IntegrationProvider
+  config       String              // encrypted JSON: {iv, tag, ciphertext} base64
+  status       IntegrationStatus   @default(untested)
+  lastTestedAt DateTime?
+  lastError    String?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  userId       String
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@index([userId])
 }
